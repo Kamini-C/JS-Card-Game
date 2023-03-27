@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/pnotify/3.2.1/pnotify.js" integrity="sha512-dDguQu7KUV0H745sT2li8mTXz2K8mh3mkySZHb1Ukgee3cNqWdCFMFsDjYo9vRdFRzwBmny9RrylAkAmZf0ZtQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pnotify/3.2.1/pnotify.css" integrity="sha512-7nl+p1joxw4BaxI37ELCqOphI6r6RqSyP99ODeAP2E6EuZ5+xBaBelC6YLQejPmHWhlF5U++odEx+6yhm/IVnw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pnotify/3.2.1/pnotify.brighttheme.css" integrity="sha512-VZ8VIoyL8sh1QjDpPRkOgdyNAgw3RzARFRSdCeUU8A9veGRa+AIKvkiQYoAEuV9OMxIBdleXwspdWcHrDzF5Hw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Javascript - Memory Card Game</title>
+	<meta name="description" content="description">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+		body{
+			background: antiquewhite;
+			font-size: 18px;
+			text-align: center;
+			font-weight: 600;
+			padding: 20px;
+		}
+		div {
+			margin-bottom: 20px;
+		}
+		img{
+			height: 200px;
+			padding: 20px;
+		}
+		.score {
+			display: block;
+			border: 2px solid #e340ffe3;
+			background: #e553fb;
+			width: 50%;
+			margin: auto;
+			border-radius: 50px;
+			box-shadow: 8px 8px 8px 1px #2c007a;
+			margin-bottom: 20px;
+		}
+		img.block:hover{
+			transform: scale(1.1);
+		}
+	</style>
+	<script type="text/javascript">
+		var selectedImgDataId = []; 
+		var selectedImgId = []; // Revealed cards
+		var cardsMatched = 0;
+		var tries = 0;
+		var max = 4; //maximum limit for random Index
+		
+		function loadCards(){
+			selectedImgDataId = []; 
+			selectedImgId = [];
+			cardsMatched = 0;
+			tries = 0;
+			var imgArr = ["0","1","2","3","0","1","2","3"];
+			blocks = document.getElementsByClassName("block"); // blocks = document.querySelectorAll("img");
+			for(i=0;i< blocks.length;i++){
+				blocks[i].setAttribute("src","images/card.jpg");
+				blocks[i].id=i;
+				randomIndex = parseInt(Math.random()*(imgArr.length));
+				randomNumArr = imgArr[randomIndex];
+				imgArr.splice(randomIndex,1);
+				blocks[i].setAttribute("data-id",randomNumArr);
+				blocks[i].addEventListener("click",revealBlock);
+			}
+			scoreBoard();
+		}
+		function scoreBoard(){
+			document.getElementById("cardsMatched").innerHTML = cardsMatched;
+			document.getElementById("tries").innerHTML = tries;
+			if(cardsMatched == 4){
+				// customAlert("Congrats! You Won!");
+				confetti({
+						particleCount: 1000,
+						spread: 100,
+						origin: { y: 0.8 }
+						});
+			}
+		}
+		function revealBlock(){
+			this.style.transition= "transform 1.5s";
+			this.style.transform= "rotateY(180deg)";
+			this.setAttribute("src","images/"+this.dataset.id+".png");
+			selectedImgDataId.push(this.dataset.id);
+			selectedImgId.push(this.id);
+			if(selectedImgDataId.length == 2){
+				setTimeout(matchCards,1000);
+			}
+			else{
+				freezeCard(this.id);
+			}
+		}
+		function freezeCard(id){
+			document.getElementById(id).removeEventListener("click",revealBlock);
+		}
+		function matchCards(){
+			if(selectedImgDataId[0] == selectedImgDataId[1]){
+				customAlert("Cards matched");
+				document.getElementById(selectedImgId[0]).removeEventListener("click",revealBlock);
+				document.getElementById(selectedImgId[1]).removeEventListener("click",revealBlock);
+				cardsMatched += 1;
+			}else{
+				customAlert("Try again", "error");
+				tries += 1;
+				resetCards();
+			}
+			selectedImgId = [];
+			selectedImgDataId = [];
+			scoreBoard();
+		}
+		function resetCards(){
+			img0=document.getElementById(selectedImgId[0]);
+			img1=document.getElementById(selectedImgId[1]);
+			img0.setAttribute("src","images/card.jpg");
+			img1.setAttribute("src","images/card.jpg");
+			img0.addEventListener("click",revealBlock);
+			img1.addEventListener("click",revealBlock);
+			img0.style.transition= "";
+			img0.style.transform= "";
+		}
+
+		function customAlert(alertText, alertType = 'success'){
+			PNotify.removeAll();
+			$(function(){
+				new PNotify({
+					text: alertText,
+					type: alertType,
+					delay: 10000,
+					styling: "brighttheme",
+					animation: 'fade',
+					width: '200px',
+				});
+			});
+		}
+	</script>
+</head>
+<body onload="loadCards()">
+	<p>1. Click on any card to start playing.</p>
+	<div class="score">Cards Matched : <span id="cardsMatched"> </span></div>
+	<div class="score">Failed Attempts : <span id="tries"> </span></div>
+	<div class="score" onclick="loadCards()">Reset</div>
+	<div id="game">
+		<img class="block" alt="Card image"/>
+		<img class="block" alt="Card image"/>
+		<img class="block" alt="Card image"/>
+		<img class="block" alt="Card image"/><br/>
+		<img class="block" alt="Card image"/>
+		<img class="block" alt="Card image"/>
+		<img class="block" alt="Card image"/>
+		<img class="block" alt="Card image"/>
+		
+	</div>
+</body>
+</html>
