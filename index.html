@@ -21,24 +21,32 @@
 			font-size: 18px;
 			text-align: center;
 			font-weight: 600;
-			padding: 20px;
+			font-family: system-ui;
 		}
 		div {
 			margin-bottom: 20px;
 		}
 		img{
-			height: 200px;
-			padding: 20px;
+			height: 190px;
+			padding: 10px;
+			width: 150px;
 		}
 		.score {
-			display: block;
-			border: 2px solid #e340ffe3;
-			background: #e553fb;
-			width: 50%;
+			display: inline-block;
+			padding: 20px;
+			background: #abdcff;
+			width: 6em;
+			border-radius: 3em;
+			box-shadow: 3px 2px 1px 1px #2c007a;
+			margin: 0px 10px 15px;
+		}
+		.btn{
+			width: 6em;
 			margin: auto;
-			border-radius: 50px;
-			box-shadow: 8px 8px 8px 1px #2c007a;
-			margin-bottom: 20px;
+			background: #abdcff;
+			padding: 5px;
+			border: 1px solid black;
+			border-radius: 5px;
 		}
 		img.block:hover{
 			transform: scale(1.1);
@@ -139,10 +147,12 @@
 	</script>
 </head>
 <body onload="loadCards()">
-	<p>1. Click on any card to start playing.</p>
+	<h2>Card Game</h2>
 	<div class="score">Cards Matched : <span id="cardsMatched"> </span></div>
 	<div class="score">Failed Attempts : <span id="tries"> </span></div>
-	<div class="score" onclick="loadCards()">Reset</div>
+	<br/>
+	<div class="btn resetBtn" onclick="loadCards()">Reset</div>
+	<span>Click on any card to start playing.</span>
 	<div id="game">
 		<img class="block" alt="Card image"/>
 		<img class="block" alt="Card image"/>
